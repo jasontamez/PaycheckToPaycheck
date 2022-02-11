@@ -1,0 +1,676 @@
+:root {
+	--main-fg: #014;
+	--main-bg: #def;
+	--link-hover-color: #600;
+	--link-border: #89b;
+	--link-hover-border: #933;
+	--link-hover-bg: #eef;
+	--sub-border: #fff;
+	--sub-bg: #cdf;
+	--accent-fg: #fff;
+	--accent-bg: #679;
+	--accent-border: #f9f9ff;
+
+	--sub-bg: #c0d0ff;
+	--side-bg: #334;
+	--side-bg: #3f220f;
+	--side-fg: #fff;
+	--side-border: #060402;
+	--main-fg: #fff;
+	--main-bg: #738b91;
+
+	--main-bg: #3f4b3b;
+	--main-fg: #efdfbb;
+
+	--pay-bg: #568314;
+	--pay-fg: #f0fff0;
+	--pay-fg: var(--main-fg);
+	--pay-bg-faded: #568314cc;
+	--bill-bg: #772014;
+	--bill-fg: #fff0f0;
+	--bill-fg: var(--main-fg);
+	--bill-bg-faded: #772014cc;
+	--flow-bg: #002b36;
+	--calc-bg: #3f4b3b;
+	--calc-bg: var(--side-bg);
+	--calc-bg: transparent;
+	--calc-flow-bg: var(--flow-bg);
+
+	--side-fg: #efdfbb;
+
+	/* button1 = normal, button2 = bill, button3 = payday */
+	--button1-bg: #fffff0;
+	--button1-bg: var(--main-fg);
+	--button1-fg: #000;
+	--button1-border-full: 0.1em #666 solid;
+	--button1-hover-bg: #ccccc0;
+	--button1-shadow: 0 0 2px 1px #3cf;
+	--button1-shadow-active: inset 2px 2px 3px 0 #000c;
+
+	--button2-bg: var(--bill-bg);
+	--button2-fg: var(--bill-fg);
+	--button2-border-c: #600;
+	--button2-hover-bg: #d55;
+	--button2-shadow: 0 0 3px 1px #f66;
+
+	--button3-bg: var(--pay-bg);
+	--button3-fg: var(--pay-fg);
+	--button3-border-c: #060;
+	--button3-hover-bg: #74993e;
+	--button3-hover-fg: var(--button3-fg);
+	--button3-shadow: 0 0 2px 1px #6f6;
+
+}
+
+
+/* Main */
+
+body {
+	color: var(--main-fg);
+	background: var(--main-bg);
+	/*font-size: calc(16px + (20 - 16) * ((100vw - 35em) / (1600 - 300)));*/
+		font-size: calc((100vw - 35em) * 4 / 1300 + 16px);
+	font-family: georgia,"times new roman",serif;
+	margin: 0;
+	display: flex;
+	flex-flow: row nowrap;
+	text-align: center;
+	justify-content: flex-start;
+	align-content: stretch;
+	min-height: 90vh;
+}
+body.overlayActive {
+	overflow: hidden;
+}
+#main {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-evenly;
+	align-items: flex-start;
+	align-content: stretch;
+	text-align: center;
+	/*border: 5px double var(--sub-border);
+	background: var(--sub-bg);*/
+	padding: 1em 1.5em;
+	font-weight: normal;
+	box-sizing: border-box;
+	width: 100%;
+	flex-grow: 1;
+}
+#flow,
+#calcFlow {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: flex-start;
+	align-items: stretch;
+	align-content: flex-start;
+	box-sizing: border-box;
+	flex-basis: calc((100% - 1em - 20px) / 2);
+}
+#main > div,
+#calcFlow {
+	/* border: 5px double var(--sub-border); */
+	border-radius: 1em;
+}
+#calcFlow {
+	min-height: 5em;
+	max-height: calc(100vh - 5em);
+	background: #666;
+	background: var(--calc-flow-bg);
+	padding: 0.25em;
+	overflow: auto;
+}
+#calcFlow > div.item:first-child {
+	border-top-left-radius: 1em;
+	border-top-right-radius: 1em;
+}
+#calcFlow > div.item:last-child {
+	border-bottom-left-radius: 1em;
+	border-bottom-right-radius: 1em;
+}
+#flow {
+	background: var(--flow-bg);
+	margin-right: 0em;
+	flex-grow: 1;
+	align-self: stretch;
+}
+#main #calc {
+	background: #333;
+	background: var(--calc-bg);
+	margin-left: 0;
+	max-width: 0;
+	border-width: 5px 0;
+	overflow: hidden;
+	transition:
+		border-width 0.5s ease,
+		margin-left 0.5s ease,
+		max-width 0.5s ease;
+	position: sticky;
+	top: 1em;
+}
+#main #calc.open {
+	max-width: 50%;
+	overflow: auto;
+	margin-left: 1em;
+	border-width: 5px;
+	transition:
+		border-width 0.5s ease,
+		margin-left 0.2s ease,
+		max-width 0.5s ease;
+}
+#main #calc > div:first-child {
+	padding: 0.2em 1em;
+	font-size: 0.85em;
+}
+#calcControls {
+	display: flex;
+	flex-flow: row wrap;
+	padding: 0.25em;
+	justify-content: center;
+	align-items: flex-start;
+	align-content: flex-start;
+}
+#sidebar {
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	align-content: flex-start;
+	margin: 0;
+	background: var(--side-bg);
+	background-image:  linear-gradient(90deg, var(--side-bg) 96%, var(--side-border) 100%);
+	color: var(--side-fg);
+	max-width: min-content;
+	min-height: 100vh;
+	padding: 1em;
+	border-width: 0 1px 0 0;
+	border-style: solid;
+	border-color: var(--side-border);
+	align-self: flex-start;
+	box-sizing: border-box;
+	position: sticky;
+	top: 0;
+	bottom: 0;
+}
+.overlay {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+	background: #000c;
+	color: #fffff0;
+	display: none;
+	flex-flow: column nowrap;
+	justify-content: center;
+	overflow: scroll;
+	/*
+	margin: 1em;
+	border-radius: 1em;
+	*/
+}
+#loading.loading {
+	display: block;
+	z-index: 99999;
+}
+.inputPanel {
+	border-style: solid;
+	border-color: transparent;
+	border-width: 2em 20vw;
+	overflow: auto;
+	display: grid;
+}
+.inputPanel > div {
+	background: #933c;
+	background: var(--bill-bg-faded);
+	background-origin: padding-box;
+	background-clip: padding-box;
+	padding: 0 2em;
+}
+.inputPanel > div.first {
+	padding-top: 1em;
+}
+.inputPanel > div:last-child {
+	padding-bottom: 1em;
+}
+#addPay > div {
+	background: #393c;
+	background: var(--pay-bg-faded);
+}
+#export > div,
+#import > div {
+	background: #fff9;
+}
+.overlay textarea {
+	height: 50vh;
+	width: 90%;
+}
+div.choice,
+.hidden {
+	display: none !important;
+}
+div.newLevel {
+	padding-top: 1.5em !important;
+}
+div.flexAll,
+div.flexAll div {
+	flex-flow: column nowrap;
+	justify-content: center;
+}
+div.flexColRow div {
+	flex-flow: row wrap;
+}
+div.flexDisplay {
+	display: flex !important;
+}
+div.blockDisplay {
+	display: block !important;
+}
+div.gridDisplay {
+	display: grid !important;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr auto auto auto auto auto 1fr;
+	grid-template-areas:
+		"."
+		"main"
+		"r2"
+		"r3"
+		"r4"
+		".";
+}
+div.gridDisplay > div:first-of-type {
+	grid-area: main;
+}
+div.gridDisplay > div:nth-of-type(2) {
+	grid-area: r2;
+}
+div.gridDisplay > div:nth-of-type(3) {
+	grid-area: r3;
+}
+div.gridDisplay > div:nth-of-type(4) {
+	grid-area: r4;
+}
+div.gridDisplay > div.gridDisplay {
+	display: flex !important;
+}/*
+h1 {
+	margin: 1em auto;
+}
+h2 {
+	margin: 0.5em auto;
+	text-align: center;
+	color: var(--sub-border);
+	background: var(--accent-bg);
+	background-image:
+		linear-gradient(
+			to bottom,
+			var(--sub-bg),
+			transparent 0.2em,
+			transparent calc(100% - 0.15em),
+			var(--sub-bg)
+		),
+		linear-gradient(
+			to left,
+			var(--sub-bg),
+			transparent 0.2em,
+			transparent calc(100% - 0.2em),
+			var(--sub-bg)
+		);
+	padding: 5px 10px;
+} */
+header {
+	margin: 2em auto 1em;
+	padding: 1em 1em 0.5em;
+	border-top: 1px solid #fff9;
+	min-width: 100%;
+	box-sizing: border-box;
+	font-size: 0.83em;
+	font-weight: bold;
+}
+.overlay header {
+	font-size: 1.5em;
+	margin: 0 0 0.83em 0;
+	padding: 0;
+	border-top: 0;
+}
+input,
+select {
+	background: var(--button1-bg);
+}
+button {
+	background: var(--button1-bg);
+	color: var(--button1-fg);
+	border: var(--button1-border-full);
+	padding: 0.2em 0.5em 0.25em;
+	margin: 0.15em;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	font-size: 0.75em;
+	font-weight: bold;
+	white-space: nowrap;
+	--default-display: inline-block;
+}
+button.bill {
+	background: var(--button2-bg);
+	color: var(--button2-fg);
+	border-color: var(--button2-border-c);
+	/*min-width: 12em;*/
+	white-space: nowrap;
+	align-self: stretch;
+}
+button.pay {
+	background: var(--button3-bg);
+	color: var(--button3-fg);
+	border-color: var(--button3-border-c);
+	margin-bottom: 0.5em;
+}
+button.doIt {
+	background: var(--button2-bg);
+	color: var(--button2-fg);
+}
+button.choice {
+	padding: 1em 1.5em;
+	margin: 1em 1.5em;
+	font-size: 1.1em;
+}
+button.toggle {
+	margin-top: 1.5em;
+}
+button:focus {
+	box-shadow: var(--button1-shadow);
+}
+button.bill:focus,
+button.doIt:focus {
+	box-shadow: var(--button2-shadow);
+}
+button.pay:focus {
+	box-shadow: var(--button3-shadow);
+}
+button:hover {
+	background: var(--button1-hover-bg);
+}
+button.bill:hover,
+button.doIt:hover {
+	background: var(--button2-hover-bg);
+	color: var(--button2-hover-fg);
+}
+button.pay:hover {
+	background: var(--button3-hover-bg);
+	color: var(--button3-hover-fg);
+}
+button:active {
+	padding: 0.2em 0.4em 0.25em 0.6em;
+	box-shadow: var(--button1-shadow-active) !important;
+}
+button.choice:active {
+	padding: 1em 1.4em 1em 1.6em;
+	box-shadow: var(--button1-shadow-active) !important;
+}
+input.max99 {
+	width: 2.5em;
+}
+input.max999 {
+	width: 3.5em;
+}
+input.max9999 {
+	width: 4em;
+}
+input.money {
+	width: 6.5em;
+}
+div.displayOpt {
+	margin-top: 1em;
+	font-size: 0.8em;
+}
+header + div.displayOpt {
+	margin-top: 0;
+}
+div.displayOpt select,
+div.displayOpt select option {
+	text-align: center;
+}
+div.date {
+	display: flex;
+	flex-flow: column nowrap;
+	/* border: 3px double var(--sub-bg); /*
+	border-color: var(--sub-bg);
+	border-width: 3px;
+	border-style: solid; */
+	box-shadow: 0px 0px 5px 2px #000c;
+	border-radius: 0.5em;
+	padding: 0.25em 0 0.5em;
+	margin: 0.25em;
+}
+time,
+#calcFlow.noTime time {
+	display: none;
+}
+div.date > time {
+	display: block;
+	padding: 0 1em 0.25em;
+	text-align: left;
+}
+#calcFlow time {
+	display: block;
+	margin-right: 0.5em;
+	font-size: 0.8em;
+}
+/*div.date > div.bill {
+	background: var(--button2-bg);
+}*/
+div.item {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+	align-items: flex-start;
+	align-content: flex-start;
+	max-width: 25%;
+}
+#flow div.item,
+#calcFlow div.item  {
+	border-color: var(--flow-bg);
+	border-width: 2px 0 0;
+	border-style: solid;
+	position: relative;
+}
+#calcFlow div.item  {
+	border-color: transparent;
+	background-clip: padding-box;
+}
+div.date > div.item,
+#calcFlow > div.item {
+	flex-basis: 50%;
+	/* flex-basis: calc(50% - 0.25em); */
+	max-width: none;
+}
+div.item > div.name {
+	margin-right: 0.25em;
+}
+div.item > div.amount {
+	margin-left: 0.25em;
+}
+div.date div.pay div.amount {
+	font-weight: bold;
+}
+div.date > div {
+	order: 2;
+}
+div.date > div.pay {
+	order: 1;
+}
+div.date > div.pay > div.name::before {
+	content: "\0021a7";
+	font-weight: bold;
+	padding: 0 0.5em;
+	filter: drop-shadow(0.15em 0.15em 0.05em #0009);
+}
+div.date > div.pay > div.amount::after {
+	content: "\0021a7";
+	font-weight: bold;
+	padding: 0 0.5em;
+	filter: drop-shadow(0.15em 0.15em 0.05em #0009);
+}
+div.delete {
+	cursor: pointer;
+	display: none;
+}
+#flow div.item div.delete,
+#calcFlow div.item div.delete {
+	position: absolute;
+	left: 0;
+	top: 0;
+	background: #0009;
+	font-size: 0.5em;
+	filter: brightness(0.65);
+}
+a:link,
+a:visited {
+	text-decoration: underline var(--link-border) dashed;
+	color: var(--main-fg);
+	background: inherit;
+}
+a:active {
+	text-decoration: underline var(--sub-border) dashed;
+	color: var(--sub-border);
+	background: inherit;
+}
+a:hover {
+	text-decoration: underline var(--link-hover-border) dashed;
+	color: var(--link-hover-color);
+	background: var(--link-hover-bg) !important;
+}
+.linkHover {
+	color: var(--link-hover-color);
+	background: var(--link-hover-bg) !important;
+}
+.linkHoverMax {
+	color: var(--link-hover-color) !important;
+	background: var(--link-hover-bg) !important;
+}
+
+label {
+	display: inline-block;
+	padding: 0 0.25em;
+	margin: 0.15em 0;
+}
+div.item.bill {
+	background-color: #c33;
+	background-color: var(--bill-bg);
+}
+div.item.pay {
+	background-color: #393;
+	background-color: var(--pay-bg);
+}
+
+
+@media (hover: none) {
+	#flow div.item div.delete {
+		display: block;
+	}
+}
+@media (hover: hover) {
+	#flow div.item div.delete {
+		display: none;
+	}
+	#flow div.item:hover div.delete {
+		display: block;
+	}
+}
+
+
+/* Phone Displays */
+
+@media only screen and (max-width: 800px) {
+
+	#main {
+		padding-left: 0;
+		padding-right: 0;
+		padding-top: 0;
+		border-width: 0;
+	}
+
+}
+
+
+
+/* SWEET ALERT 2*/
+
+/*.alertBox {
+	background: var(--main-bg);
+	color: var(--main-fg);
+}
+.alertBox button {
+	background: var(--accent-bg);
+	border-color: var(--accent-border);
+	color: var(--main-bg);
+	font-size: 1.25em;
+	margin-top: 1em;
+}*/
+
+
+
+
+/* DRAGULA */
+
+/* Set up color variables 
+:root {
+	--default-inner-bg: #efe;
+	--name-bg: #363;
+	--neutral-bg: #ccc;
+	--semi-transp-bg: rgba(102, 51, 51, 0.9);
+	--button-fg: #efd;
+	--button-bg: #250;
+
+	--main-fg: #140;
+	--main-bg: #efd;
+	--link-hover-color: #060;
+	--link-border: #9b8;
+	--link-hover-border: #393;
+	--link-hover-bg: #9f8;
+	--sub-border: #fff;
+	--sub-bg: #dfc;
+
+	--alternate: #a11;
+}*/
+
+/* Dragula styles */
+.draggable .item {
+	cursor: grab;
+}
+.gu-mirror {
+	position: fixed !important;
+	margin: 0 !important;
+	z-index: 9999 !important;
+	opacity: 0.8;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+	filter: alpha(opacity=80);
+	border-color: transparent !important;
+}
+.gu-hide {
+	display: none !important;
+}
+.gu-unselectable {
+	-webkit-user-select: none !important;
+	-moz-user-select: none !important;
+	-ms-user-select: none !important;
+	user-select: none !important;
+}
+.gu-transit {
+	opacity: 0.2;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+	filter: alpha(opacity=20);
+}
+
+
+/* My styles */
+
+.fuzzy {
+	display: inline-block;
+}
+
+.gu-mirror {
+	cursor: grabbing;
+}
+
+
+
+

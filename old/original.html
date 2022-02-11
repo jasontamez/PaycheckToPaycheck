@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Budget Helper</title>
+	<link rel="stylesheet" href="reset-beta.css" type="text/css">
+	<link rel="stylesheet" href="tank03.css" type="text/css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+	<meta name="theme-color" content="#003">
+</head>
+<body>
+<div id="sidebar">
+	<!--<button id="y"></button>
+	<button id="z"></button>-->
+	<button class="main basic pay" data-show-id="addPay,recurringPay" data-display="grid,grid">Add Payday</button>
+	<button class="main basic buttonToggle colorPicker bill" data-show-id="addBill,oneTimeBill,billAmount" data-display="grid,flex,block" data-button="submitBill" data-prefix="oO">Add One-Time Bill</button>
+	<button class="main basic bill" data-show-id="addBill,recurringBill" data-display="grid,grid">Add Recurring Bill</button>
+	<button id="calcToggle" class="functional" data-text="Close Calc &rArr;">Open Calc &rArr;</button>
+	<header>Display Options</header>
+	<div class="displayOpt">
+		Show previous:<br>
+		<select id="showPrevious">
+			<option value="w1">week</option>
+			<option value="w2" selected>two weeks</option>
+			<option value="w4">four weeks</option>
+			<option value="m1">month</option>
+			<option value="m2">two months</option>
+			<option value="m3">three months</option>
+			<option value="m6">six months</option>
+		</select>
+	</div>
+	<div class="displayOpt">
+		Show next:<br>
+		<select id="showNext">
+			<option value="w2">two weeks</option>
+			<option value="w4">four weeks</option>
+			<option value="m1">month</option>
+			<option value="m2" selected>two months</option>
+			<option value="m3">three months</option>
+			<option value="m6">six months</option>
+			<option value="y1">year</option>
+		</select>
+	</div>
+	<div class="displayOpt">
+		Date format:<br>
+		<select id="dateFormat">
+			<option value="us1">Month DD, YYYY</option>
+			<option value="us2">M/D/YYYY</option>
+			<option value="uk1">D/M/YYYY</option>
+			<option value="uk2" selected>DD-Mon-YYYY</option>
+			<option value="uk3">DD-Month-YYYY</option>
+			<option value="rev">YYYY/M/D</option>
+		</select>
+	</div>
+	<header>Save Options</header>
+	<div>
+		<button class="functional" id="saveBrowser">Save to Browser</button>
+		<button class="functional" id="clearBrowser">Clear from Browser</button>
+		<button class="functional" id="loadFromBrowser">Load Info from Browser</button>
+		<button class="functional main basic" id="doImport" data-display="flex" data-show-id="import">Import</button>
+		<button class="functional main basic" id="doExport" data-display="flex" data-show-id="export">Export</button>
+	</div>
+</div>
+
+<div id="main">
+	<div id="flow">
+
+	</div>
+	<div id="calc">
+		<div>Drag bills and paydays into the area below to sort, total, and otherwise play with the numbers.</div>
+		<div id="calcFlow" class="draggable">
+
+		</div>
+		<div id="calcControls">
+			<button class="functional" id="copyFill">Copy Info From Left</button>
+			<button class="functional" id="toggleDates">Toggle Dates</button>
+			<button class="functional" id="sortCalc">Sort By Date</button>
+			<button class="functional" id="clearCalc">Clear Content</button>
+			<!--<button class="" id=""></button>
+			<button class="" id=""></button>
+			<button class="" id=""></button>
+			<button class="" id=""></button>-->
+		</div>
+	</div>
+</div>
+
+<div id="addBill" class="inputPanel overlay flexAll choice">
+	<div id="recurringBill" class="first flexColRow choice">
+		<header>New Recurring Bill</header>
+		<div>Bill reoccurs every certain number of...</div>
+		<div>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitBill" data-base-id="recurringBill" data-show-id="billAmount" data-show-class="start" data-show-subclass="year" data-display="block" data-prefix="rY">Years</button>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitBill" data-base-id="recurringBill" data-show-id="billAmount" data-show-class="start" data-show-subclass="month" data-display="block" data-prefix="rM">Months</button>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitBill" data-base-id="recurringBill" data-show-id="billAmount" data-show-class="start" data-show-subclass="week" data-display="block" data-prefix="rW">Weeks</button>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitBill" data-base-id="recurringBill" data-show-id="billAmount" data-show-class="start" data-show-subclass="day" data-display="block" data-prefix="rD">Days</button>
+		</div>
+		<div class="start choice newLevel">
+			<div class="year choice">Repeats once every
+				<input id="rYNum" class="max99 hasDefault" type="number" min="1" max="10" value="1">
+				years, on the
+				<input id="rYDay" class="todayD dayInput max99" type="number" min="1" max="31" data-ordinal-id="rYDayOrdinal"><sup id="rYDayOrdinal" class="ordinalText"></sup>
+				of
+				<select id="rYMonth" class="todayM" data-month-for="rYDay">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>,
+				starting in
+				<input id="rYYear" class="todayY max9999" type="number" min="2001" max="9999">
+			</div>
+			<div class="month choice">Repeats on the 
+				<input id="rMDay" class="todayD max99" type="number" min="1" max="28" data-ordinal-id="rMDayOrdinal"><sup id="rMDayOrdinal" class="ordinalText"></sup>
+				day of the month, counting from the
+				<select id="rMStartOrEnd">
+					<option value="start">beginning</option>
+					<option value="end">end</option>
+				</select>
+				of the month, every
+				<input id="rMNum" type="number" class="hasDefault max99" min="1" max="23" value="1">
+				month(s), starting in 
+				<select id="rMMonth" class="todayM">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>
+				of
+				<input id="rMYear" class="todayY max9999" type="number" min="2001" max="9999">
+			</div>
+			<div class="week choice">Repeats every
+				<input id="rWNum" type="number" min="1" max="104" value="2" class="hasDefault max999">
+				week(s) on
+				<select id="rWWeekday" class="todayWD weekday" data-date="rWDay" data-month="rWMonth" data-year="rWYear">
+					<option value="0">Sunday</option>
+					<option value="1">Monday</option>
+					<option value="2">Tuesday</option>
+					<option value="3">Wednesday</option>
+					<option value="4">Thursday</option>
+					<option value="5">Friday</option>
+					<option value="6">Saturday</option>
+				</select>,
+				starting on the
+				<input id="rWDay" class="todayD dayInput max99" type="number" min="1" max="31" data-has-weekday="rWWeekday rWDay rWMonth rWYear" data-ordinal-id="rWDayOrdinal"><sup id="rWDayOrdinal" class="ordinalText"></sup>
+				of
+				<select id="rWMonth" class="todayM" data-month-for="rWDay" data-has-weekday="rWWeekday rWDay rWMonth rWYear">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>,
+				<input id="rWYear" class="todayY max9999" type="number" min="2001" max="9999" data-has-weekday="rWWeekday rWDay rWMonth rWYear">
+			</div>
+			<div class="day choice">Repeats every
+				<input class="hasDefault max9999" id="rDNum" type="number" min="1" max="1000" value="10">
+				days, starting on the
+				<input id="rDDay" class="todayD dayInput max99" type="number" min="1" max="31" data-ordinal-id="rDDayOrdinal"><sup id="rDDayOrdinal" class="ordinalText"></sup>
+				of
+				<select id="rDMonth" class="todayM" data-month-for="rDDay">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>,
+				<input id="rDYear" class="todayY max9999" type="number" min="2001" max="9999">
+			</div>
+		</div>
+	</div>
+	<div id="oneTimeBill" class="first choice">
+		<header>New One-Time Bill</header>
+		<div>Bill is due on the
+			<input id="oODay" class="todayD dayInput max99" type="number" min="1" max="31" data-ordinal-id="oODayOrdinal"><sup id="oODayOrdinal" class="ordinalText"></sup>
+			of
+			<select id="oOMonth" class="todayM" data-month-for="oODay">
+				<option value="0">January</option>
+				<option value="1">February</option>
+				<option value="2">March</option>
+				<option value="3">April</option>
+				<option value="4">May</option>
+				<option value="5">June</option>
+				<option value="6">July</option>
+				<option value="7">August</option>
+				<option value="8">September</option>
+				<option value="9">October</option>
+				<option value="10">November</option>
+				<option value="11">December</option>
+			</select>,
+			<input id="oOYear" class="todayY max9999" type="number" min="2001" max="9999">
+		</div>
+	</div>
+	<div id="billAmount" class="newLevel choice">
+		Name for Bill: <input id="billName" type="text" value="" class="hasDefault"><br>
+		Bill amount: $<input id="amount" type="number" step="0.01" value="100.00" min="0.00" max="99999.99" class="hasDefault money">
+	</div>
+	<div class="newLevel">
+		<button id="resetBill">Reset</button>
+		<button id="submitBill" disabled data-prefix="">Submit</button>
+	</div>
+</div>
+
+
+
+
+<div id="addPay" class="inputPanel overlay flexAll choice">
+	<div id="recurringPay" class="flexColRow choice first">
+		<header>New Payday</header>
+		<div>Payday reoccurs every certain number of...</div>
+		<div>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitPay" data-base-id="recurringPay" data-show-id="payName" data-show-class="start" data-show-subclass="month" data-display="block" data-prefix="pM">Months</button>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitPay" data-base-id="recurringPay" data-show-id="payName" data-show-class="start" data-show-subclass="week" data-display="block" data-prefix="pW">Weeks</button>
+			<button class="basic buttonToggle durationChooser colorPicker" data-button="submitPay" data-base-id="recurringPay" data-show-id="payName" data-show-class="start" data-show-subclass="day" data-display="block" data-prefix="pD">Days</button>
+		</div>
+		<div class="start choice newLevel">
+			<div class="month choice">Repeats on the 
+				<input id="pMDay" class="todayD max99" type="number" min="1" max="28" data-ordinal-id="pMDayOrdinal"><sup id="pMDayOrdinal" class="ordinalText"></sup>
+				day of the month, counting from the
+				<select id="pMStartOrEnd">
+					<option value="start">beginning</option>
+					<option value="end">end</option>
+				</select>
+				of the month, every
+				<input id="pMNum" type="number" class="hasDefault max99" min="1" max="23" value="1">
+				month(s), starting in 
+				<select id="pMMonth" class="todayM">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>
+				of
+				<input id="pMYear" class="todayY max9999" type="number" min="2001" max="9999">
+			</div>
+			<div class="week choice">Repeats every
+				<input id="pWNum" type="number" min="1" max="104" value="2" class="hasDefault max999">
+				week(s) on
+				<select id="pWWeekday" class="todayWD weekday" data-date="pWDay" data-month="pWMonth" data-year="pWYear">
+					<option value="0">Sunday</option>
+					<option value="1">Monday</option>
+					<option value="2">Tuesday</option>
+					<option value="3">Wednesday</option>
+					<option value="4">Thursday</option>
+					<option value="5">Friday</option>
+					<option value="6">Saturday</option>
+				</select>,
+				starting on the
+				<input id="pWDay" class="todayD dayInput max99" type="number" min="1" max="31" data-has-weekday="pWWeekday pWDay pWMonth pWYear" data-ordinal-id="pWDayOrdinal"><sup id="pWDayOrdinal" class="ordinalText"></sup>
+				of
+				<select id="pWMonth" class="todayM" data-month-for="pWDay" data-has-weekday="pWWeekday pWDay pWMonth pWYear">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>,
+				<input id="pWYear" class="todayY max9999" type="number" min="2001" max="9999" data-has-weekday="pWWeekday pWDay pWMonth pWYear">
+			</div>
+			<div class="day choice">Repeats every
+				<input class="hasDefault max9999" id="pDNum" type="number" min="1" max="1000" value="10">
+				days, starting on the
+				<input id="pDDay" class="todayD dayInput max99" type="number" min="1" max="31" data-ordinal-id="pDDayOrdinal"><sup id="pDDayOrdinal" class="ordinalText"></sup>
+				of
+				<select id="pDMonth" class="todayM" data-month-for="pDDay">
+					<option value="0">January</option>
+					<option value="1">February</option>
+					<option value="2">March</option>
+					<option value="3">April</option>
+					<option value="4">May</option>
+					<option value="5">June</option>
+					<option value="6">July</option>
+					<option value="7">August</option>
+					<option value="8">September</option>
+					<option value="9">October</option>
+					<option value="10">November</option>
+					<option value="11">December</option>
+				</select>,
+				<input id="pDYear" class="todayY max9999" type="number" min="2001" max="9999">
+			</div>
+		</div>
+	</div>
+	<div id="payName" class="newLevel choice">
+		Name for PayDay: <input id="paydayName" type="text" value="PAYDAY" class="hasDefault">
+	</div>
+	<div class="newLevel">
+		<button id="resetPay">Reset</button>
+		<button id="submitPay" disabled data-prefix="">Submit</button>
+	</div>
+</div>
+
+
+<div id="export" class="inputPanel overlay flexAll choice">
+	<div class="first">
+		<textarea readonly cols="40" rows="10" id="exportBox"></textarea><br><br>
+		<button id="resetExport">Done</button>
+	</div>
+</div>
+
+
+<div id="import" class="inputPanel overlay flexAll choice">
+	<div class="first">
+		<textarea cols="40" rows="10" id="importBox"></textarea><br><br>
+		<button id="tryImport">Done</button> <button id="cancelImport">Cancel</button>
+	</div>
+</div>
+
+
+<div id="loading" class="overlay">Loading...</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js" integrity="sha256-ug4bHfqHFAj2B5MESRxbLd3R3wdVMQzug2KHZqFEmFI=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.js" integrity="sha256-H9jAz//QLkDOy/nzE9G4aYijQtkLt9FvGmdUTwBk6gs=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.all.min.js"></script>
+<script src="budget.js"></script>
+</body>
+</html>
+
