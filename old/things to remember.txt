@@ -1,0 +1,10 @@
+Intl support:
+
+# See: https://expo.canny.io/feature-requests/p/add-intl-support
+#modify app.json
+"expo" -> "plugins": ["@config-plugins/android-jsc-intl"]
+# Then rebuild as described here: https://docs.expo.dev/workflow/customizing/
+>>expo prebuild
+>>expo run:android
+
+
