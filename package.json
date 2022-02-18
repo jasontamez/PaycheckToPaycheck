@@ -1,6 +1,6 @@
 {
   "name": "paychecktopaycheck",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -10,15 +10,24 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@config-plugins/android-jsc-intl": "^0.0.2",
+    "@react-native-async-storage/async-storage": "~1.15.0",
     "expo": "~44.0.0",
+    "expo-dev-client": "~0.8.4",
     "expo-status-bar": "~1.2.0",
+    "luxon": "^2.3.0",
     "native-base": "^3.3.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
-    "react-native-web": "0.17.1",
+    "react-native-safe-area-context": "3.3.2",
     "react-native-svg": "12.1.1",
-    "react-native-safe-area-context": "3.3.2"
+    "react-native-web": "0.17.1",
+    "react-redux": "^7.2.6",
+    "redux": "^4.1.2",
+    "redux-persist": "^6.0.0",
+    "redux-persist-expo-filesystem": "^2.0.0",
+    "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
