@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { NativeBaseProvider, Box, Switch } from "native-base";
+import { NativeBaseProvider, Box, Switch, VStack } from "native-base";
 import { StyleSheet, Text, View } from 'react-native';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import configureStore from './store/store';
 import { PersistGate } from 'redux-persist/integration/react';
+import getTheme from './components/theme';
 
 const App = () => {
 	const [isEnabled, setIsEnabled] = useState(false);
 	const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 	const {store, persistor} = configureStore();
+	const themeName = ((state) => state.theme);
+	const theme = getTheme(themeName);
 
 	const loading = null;
 
 	return (
 		<Provider store={store}>
-			<NativeBaseProvider>
+			<NativeBaseProvider theme={theme}>
 				<PersistGate loading={loading} persistor={persistor}>
+					<VStack space="sm">
+						<Box></Box>
+					</VStack>
 					<View style={styles.main}>
 						<Box alignSelf="center" _text={{color: "#0ff"}}>Hellooooo world.</Box>
 						<Switch
