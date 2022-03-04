@@ -3,7 +3,7 @@
 //import debounce from './debouncer';
 import packageJson from '../package.json';
 import appJson from '../app.json';
-//import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 
 //
@@ -17,6 +17,15 @@ export let VERSION = {
 const p = "paychecktopaycheck/reducer/";
 const UPDATE_THEME = p+"UPDATE_THEME";
 const SET_PAGE = p+"SET_PAGE";
+const ADD_BILL = p+"ADD_BILL";
+const ADD_SUBTOTAL = p+"ADD_SUBTOTAL";
+const REMOVE_BILL = p+"REMOVE_BILL";
+const REMOVE_SUBTOTAL = p+"REMOVE_SUBTOTAL";
+const UPDATE_TIMELINE = p+"UPDATE_TIMELINE";
+const UPDATE_CURRENTVIEW = p+"UPDATE_CURRENTVIEW";
+const SET_TODAY = p+"SET_TODAY";
+const SET_PREVIOUS = p+"SET_PREVIOUS";
+const SET_NEXT = p+"SET_NEXT";
 
 
 //
@@ -24,6 +33,33 @@ const SET_PAGE = p+"SET_PAGE";
 // FUNCTIONS
 //
 //
+export function addBill(payload) {
+	return {type: ADD_BILL, payload};
+};
+export function addSubtotal(payload) {
+	return {type: ADD_SUBTOTAL, payload};
+};
+export function removeBill(payload) {
+	return {type: REMOVE_BILL, payload};
+};
+export function removeSubtotal(payload) {
+	return {type: REMOVE_SUBTOTAL, payload};
+};
+export function updateTimeline(payload) {
+	return {type: UPDATE_TIMELINE, payload};
+};
+export function updateCurrentView(payload) {
+	return {type: UPDATE_CURRENTVIEW, payload};
+};
+export function setToday(payload) {
+	return {type: SET_TODAY, payload};
+};
+export function setPrevious(payload) {
+	return {type: SET_PREVIOUS, payload};
+};
+export function setNext(payload) {
+	return {type: SET_NEXT, payload};
+};
 export function updateTheme(payload) {
 	return {type: UPDATE_THEME, payload};
 }
@@ -39,32 +75,61 @@ export function currentPage(payload) {
 //
 export const blankAppState = {
 	currentVersion: VERSION.current,
-	events: [],
+	bills: [],			// all bills
+	subtotals: [],		// all subtotals
+	timeline: [],		// all bills and subtotals, repeated and arranged in the given timeframe
+	currentView: null,	// if null, use the timeline. otherwise, this is a user-made arrangement of bills and subtotals
+	today: [4, 3, 3, 2022],	// Thursday, 3rd, March, 2022
+	previous: 0,	// how far back do the bills go? is this a set number of days, or a set number of subtotals?
+	next: 0,		// as above, but for how far ahead
 	theme: "Default",
 	page: "home"
 };
-export const blankEvent = {
+const blankBill = {
+	// id = "",
 	startDate = 0,
 	amount = 0.0,
 	name = ""
+	// description
+	// recurs
+};
+export const makeBlankBill = () => {
+	const id = uuidv4();
+	return {id, ...blankBill};
+};
+const blankSubtotal = {
+	// id = "",
+	startDate = 0,
+	workingTotal = 0,
+	name = ""
+	// description
+	// recurs
+};
+export const makeBlankSubtotal = () => {
+	const id = uuidv4();
+	return {id, ...blankSubtotal};
 };
 export const recurrance = {
 	period = "w",
 	amount = 1,
-	last = false,
-	repeatOnDay = undefined,
-	repeatOnDate = undefined,
-	repeatOnWeek = undefined,
-	shortMonth = undefined,
-	repeatonMonth = undefined
+	last = false
+	// repeatOnDay = undefined,
+	// repeatOnDate = undefined,
+	// repeatOnWeek = undefined,
+	// shortMonth = undefined,
+	// repeatOnMonth = undefined
 };
-export const eventValidator = (recur) => {
-	let	startDate = event.startDate,
-		amount = event.amount,
-		name = event.name,
-		description = event.description,
-		recurs = event.recurs;
-	if(parseInt(startDate) !== startDate) {
+export const billValidator = (bill) => {
+	let	id = bill.id,
+		startDate = bill.startDate,
+		amount = bill.amount,
+		name = bill.name,
+		description = bill.description,
+		recurs = bill.recurs;
+	if(typeof id !== "string" || !id) {
+		maybeLog("bad id");
+		return false;
+	} else if(parseInt(startDate) !== startDate) {
 		maybeLog("bad startDate");
 		return false;
 	} else if(typeof amount !== "number" || isNaN(amount) || amount < 0) {
@@ -97,6 +162,48 @@ export const eventValidator = (recur) => {
 	}
 	return output;
 };
+export const subtotalValidator = (subtotal) => {
+	let	id = subtotal.id,
+		startDate = subtotal.startDate,
+		workingTotal = subtotal.workingTotal,
+		name = subtotal.name,
+		description = subtotal.description,
+		recurs = subtotal.recurs;
+	if(typeof id !== "string" || !id) {
+		maybeLog("bad sub id");
+		return false;
+	} else if(parseInt(startDate) !== startDate) {
+		maybeLog("bad sub startDate");
+		return false;
+	} else if(parseInt(workingTotal) !== workingTotal || workingTotal < 0) {
+		maybeLog("bad sub workingTotal");
+		return false;
+	} else if(typeof name !== "string" || !name) {
+		maybeLog("bad sub name");
+		return false;
+	}
+	let output = {
+		startDate,
+		workingTotal,
+		name
+	};
+	if(description) {
+		if (typeof description !== "string" || !description) {
+			maybeLog("bad sub description");
+			return false;
+		}
+		output.description = description;
+	}
+	if (recurs) {
+		let validated = recurranceValidator(recurs);
+		if(!validated) {
+			maybeLog("(bad subtotal recurs)");
+			return false;
+		}
+		output.recurs = validated;
+	}
+	return output;
+};
 const recurranceValidator = (recur) => {
 	let	period = recur.period,
 		amount = recur.amount,
@@ -105,7 +212,7 @@ const recurranceValidator = (recur) => {
 		shortMonth = recur.shortMonth,
 		repeatOnDate = recur.repeatOnDate,
 		repeatOnWeek = recur.repeatOnWeek,
-		repeatonMonth = recur.repeatonMonth;
+		repeatOnMonth = recur.repeatOnMonth;
 	if(period !== "d" && period !== "w" && period !== "m" && period !== "y") {
 		maybeLog("bad period");
 		return false;
@@ -208,16 +315,29 @@ const recurranceValidator = (recur) => {
 //
 //
 const reduceAll = (state) => {
-	let o = {
-		currentVersion: state.currentVersion,
-		theme: state.theme,
-		page: state.page
-	};
-	return o;
+	const checkIfSubtotal = (st) => st.workingTotal || st.workingTotal === 0;
+	let output = {...state};
+	output.today = [...state.today];
+	output.bills = state.bills.map(b => reduceBill(b));
+	output.subtotals = state.subtotals.map(st => reduceSubtotal(st));
+	output.timeline = state.timeline.map(t => checkIfSubtotal(t) ? reduceSubtotal(t) : reduceBill(t));
+	if(output.currentView) {
+		output.currentView = state.currentView.map(cv => checkIfSubtotal(cv) ? reduceSubtotal(cv) : reduceBill(cv));
+	}
+	return output;
 }
-export const reduceStatus = (status) => {
-	let reduced = {...status};
-	return reduced;
+export const reduceBill = (bill) => {
+	let output = {...bill};
+	output.recurs = reduceRecur(bill.recurs);
+	return output;
+};
+export const reduceSubtotal = (subtotal) => {
+	let output = {...subtotal};
+	output.recurs = reduceRecur(subtotal.recurs);
+	return output;
+};
+export const reduceRecur = (recur) => {
+	return {...recur};
 };
 export const checkIfState = (possibleState) => {
 	const check = (possibleState);

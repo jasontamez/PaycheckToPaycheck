@@ -8,3 +8,45 @@ Intl support:
 >>expo run:android
 
 
+trypan blue 600
+#eae6ff #bfb3ff #9580fe #6a4dfe #401bfe #2601e4 #1e01b2 #15017f #0d004c #040019
+
+forest green 600
+#ebf9ed #c3eeca #9be3a6 #73d882 #4bcd5f #32b445 #278c36 #1c6426 #113c17 #061408
+
+ruby red 600
+#ffe6ea #feb4c1 #fd8298 #fc506f #fb1e45 #e1042c #af0322 #7d0218 #4b010f #190005
+
+steel blue 500
+#edf4f7 #cadde7 #a7c6d7 #84afc7 #6198b8 #477e9e #38627b #284658 #182a35 #080e12
+
+solid pink 600
+#f8edee #e9c9cd #daa5ac #cb818b #bc5d69 #a24350 #7e343e #5a252c #36161b #120709
+
+palatinate purple 700
+#fbeaf7 #f3bfe6 #ea94d6 #e26ac5 #da3fb4 #c0259b #951d78 #6b1556 #400c34 #150411
+
+french pink 200
+#ffe5ed #ffb3ca #ff80a6 #ff4d82 #ff1a5f #e60045 #b30036 #800026 #4d0017 #1a0008
+
+tangerine 500
+#fec780 #ffddb3 #fec780 #feb04d #fe9a1a #e58001 #b26401 #7f4701 #4c2b00 #190e00
+
+cultured (white)
+#f8f8f8
+
+rich black
+#070707
+
+white black lightText darkText
+dark light success error danger info
+primary secondary tertiary
+
+
+rose pink fuchsia purple violet indigo blue 
+darkBlue cyan teal emerald green lime
+yellow orange red
+
+warmGray trueGray gray coolGray blueGray
+
+amber lightBlue
