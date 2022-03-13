@@ -4,7 +4,7 @@
 import packageJson from '../package.json';
 import appJson from '../app.json';
 import { v4 as uuidv4 } from 'uuid';
-
+import { getTodayArray } from '../components/datefuncs';
 
 //
 //
@@ -18,14 +18,15 @@ const p = "paychecktopaycheck/reducer/";
 const UPDATE_THEME = p+"UPDATE_THEME";
 const SET_PAGE = p+"SET_PAGE";
 const ADD_BILL = p+"ADD_BILL";
-const ADD_SUBTOTAL = p+"ADD_SUBTOTAL";
+const ADD_PAYDAY = p+"ADD_PAYDAY";
 const REMOVE_BILL = p+"REMOVE_BILL";
-const REMOVE_SUBTOTAL = p+"REMOVE_SUBTOTAL";
+const REMOVE_PAYDAY = p+"REMOVE_PAYDAY";
 const UPDATE_TIMELINE = p+"UPDATE_TIMELINE";
-const UPDATE_CURRENTVIEW = p+"UPDATE_CURRENTVIEW";
+const UPDATE_CALC = p+"UPDATE_CALC";
 const SET_TODAY = p+"SET_TODAY";
 const SET_PREVIOUS = p+"SET_PREVIOUS";
 const SET_NEXT = p+"SET_NEXT";
+const SET_TEXT_PROP = p+"SET_TEXT_PROP";
 
 
 //
@@ -36,20 +37,20 @@ const SET_NEXT = p+"SET_NEXT";
 export function addBill(payload) {
 	return {type: ADD_BILL, payload};
 };
-export function addSubtotal(payload) {
-	return {type: ADD_SUBTOTAL, payload};
+export function addPayday(payload) {
+	return {type: ADD_PAYDAY, payload};
 };
 export function removeBill(payload) {
 	return {type: REMOVE_BILL, payload};
 };
-export function removeSubtotal(payload) {
-	return {type: REMOVE_SUBTOTAL, payload};
+export function removePayday(payload) {
+	return {type: REMOVE_PAYDAY, payload};
 };
 export function updateTimeline(payload) {
 	return {type: UPDATE_TIMELINE, payload};
 };
-export function updateCurrentView(payload) {
-	return {type: UPDATE_CURRENTVIEW, payload};
+export function updateCalc(payload) {
+	return {type: UPDATE_CALC, payload};
 };
 export function setToday(payload) {
 	return {type: SET_TODAY, payload};
@@ -66,6 +67,9 @@ export function updateTheme(payload) {
 export function currentPage(payload) {
 	return {type: SET_PAGE, payload};
 }
+export function setTextProp(payload) {
+	return {type: SET_TEXT_PROP, payload};
+}
 
 
 //
@@ -75,21 +79,26 @@ export function currentPage(payload) {
 //
 export const blankAppState = {
 	currentVersion: VERSION.current,
-	bills: [],			// all bills
-	subtotals: [],		// all subtotals
-	timeline: [],		// all bills and subtotals, repeated and arranged in the given timeframe
-	currentView: null,	// if null, use the timeline. otherwise, this is a user-made arrangement of bills and subtotals
-	today: [4, 3, 3, 2022],	// Thursday, 3rd, March, 2022
-	previous: 0,	// how far back do the bills go? is this a set number of days, or a set number of subtotals?
+	bills: [],		// all bills
+	paydays: [],	// all paydays
+	timeline: [],	// all bills and paydays, repeated and arranged in the given timeframe
+	calc: null,	// if null, not in use. otherwise, this is a user-made arrangement of bills and paydays
+	today: getTodayArray(),	// [4, 17, 1, 2022] would be Thursday, February 17th, 2022
+	previous: 0,	// how far back do the bills go? is this a set number of days, or a set number of paydays?
 	next: 0,		// as above, but for how far ahead
+	bill: "bill",
+	paycheck: "paycheck",
+	aBill: "a bill",
+	aPaycheck: "a paycheck",
 	theme: "Default",
 	page: "home"
 };
 const blankBill = {
-	// id = "",
-	startDate = 0,
-	amount = 0.0,
-	name = ""
+	// id: "",
+	// rootId: "",
+	startDate: 0,
+	amount: 0.0,
+	name: ""
 	// description
 	// recurs
 };
@@ -97,36 +106,41 @@ export const makeBlankBill = () => {
 	const id = uuidv4();
 	return {id, ...blankBill};
 };
-const blankSubtotal = {
-	// id = "",
-	startDate = 0,
-	workingTotal = 0,
-	name = ""
+const blankPayday = {
+	// id: "",
+	// rootId: "",
+	startDate: 0,
+	workingTotal: 0,
+	name: ""
 	// description
 	// recurs
 };
-export const makeBlankSubtotal = () => {
+export const makeBlankPayday = () => {
 	const id = uuidv4();
-	return {id, ...blankSubtotal};
+	return {id, ...blankPayday};
 };
 export const recurrance = {
-	period = "w",
-	amount = 1,
-	last = false
-	// repeatOnDay = undefined,
-	// repeatOnDate = undefined,
-	// repeatOnWeek = undefined,
-	// shortMonth = undefined,
-	// repeatOnMonth = undefined
+	period: "w",
+	amount: 1,
+	last: false
+	// repeatOnDay: undefined,
+	// repeatOnDate: undefined,
+	// repeatOnWeek: undefined,
+	// shortMonth: undefined,
+	// repeatOnMonth: undefined
 };
 export const billValidator = (bill) => {
 	let	id = bill.id,
+		rootId = bill.rootId,
 		startDate = bill.startDate,
 		amount = bill.amount,
 		name = bill.name,
 		description = bill.description,
 		recurs = bill.recurs;
 	if(typeof id !== "string" || !id) {
+		maybeLog("bad id");
+		return false;
+	} else if(typeof rootId !== "string" || !rootId) {
 		maybeLog("bad id");
 		return false;
 	} else if(parseInt(startDate) !== startDate) {
@@ -162,15 +176,19 @@ export const billValidator = (bill) => {
 	}
 	return output;
 };
-export const subtotalValidator = (subtotal) => {
-	let	id = subtotal.id,
-		startDate = subtotal.startDate,
-		workingTotal = subtotal.workingTotal,
-		name = subtotal.name,
-		description = subtotal.description,
-		recurs = subtotal.recurs;
+export const paydayValidator = (payday) => {
+	let	id = payday.id,
+		rootId = bill.rootId,
+		startDate = payday.startDate,
+		workingTotal = payday.workingTotal,
+		name = payday.name,
+		description = payday.description,
+		recurs = payday.recurs;
 	if(typeof id !== "string" || !id) {
 		maybeLog("bad sub id");
+		return false;
+	} else if(typeof rootId !== "string" || !rootId) {
+		maybeLog("bad id");
 		return false;
 	} else if(parseInt(startDate) !== startDate) {
 		maybeLog("bad sub startDate");
@@ -197,7 +215,7 @@ export const subtotalValidator = (subtotal) => {
 	if (recurs) {
 		let validated = recurranceValidator(recurs);
 		if(!validated) {
-			maybeLog("(bad subtotal recurs)");
+			maybeLog("(bad payday recurs)");
 			return false;
 		}
 		output.recurs = validated;
@@ -237,14 +255,14 @@ const recurranceValidator = (recur) => {
 	} else if(period === "m") {
 		// amount = 2			repeat every 2 months
 		// repeatOnDate = 30	repeat on the 30th day
-		// last = true				...starting from the 1st
+		// last = true				...starting from the first day
 		// last = false				...starting from the last day, counting backwards
 		// shortMonth = "this"	if the month has more than (30) days, use the last (or first) day of the same month
 		// shortMonth = "next"		...as above, but use the first (or last) day of the next month in counting direction
 		//
 		// repeatOnDay = 6	repeat on Saturday (0 is Sunday, 6 is max)
 		// repeatOnWeek = 4		...the 4th such of the month (1-4 only)
-		// last = true			...starting from the 1st of the month
+		// last = true			...starting from the first day of the month
 		// last = false			...starting from the last day, counting backwards
 		output.last = !!last;
 		if(repeatOnDate !== undefined) {
@@ -274,7 +292,7 @@ const recurranceValidator = (recur) => {
 		}
 	} else if(period === "y") {
 		// amount = 2			repeat every 2 years
-		// repeatOnMonth = 4	Repeat on April
+		// repeatOnMonth = 3	Repeat on April (month is 0-11)
 		// repeatOnDate = 6			...the 6th day of the month
 		// shortMonth = "this"	if this is February 29th, use February 28th on non-leap years
 		// shortMonth = "next"		...as above, but use March 1st
@@ -314,15 +332,24 @@ const recurranceValidator = (recur) => {
 // SUB-REDUCERS
 //
 //
-const reduceAll = (state) => {
-	const checkIfSubtotal = (st) => st.workingTotal || st.workingTotal === 0;
+const reduceAll = (state) => reduceAllBut(state, []);
+const reduceAllBut = (state, buts) => {
+	const checkIfPayday = (st) => st.workingTotal || st.workingTotal === 0;
+	let skippable = {};
 	let output = {...state};
-	output.today = [...state.today];
-	output.bills = state.bills.map(b => reduceBill(b));
-	output.subtotals = state.subtotals.map(st => reduceSubtotal(st));
-	output.timeline = state.timeline.map(t => checkIfSubtotal(t) ? reduceSubtotal(t) : reduceBill(t));
-	if(output.currentView) {
-		output.currentView = state.currentView.map(cv => checkIfSubtotal(cv) ? reduceSubtotal(cv) : reduceBill(cv));
+	buts.forEach((but) => {
+		skippable[but] = true;
+		delete output[but];
+	});
+	skippable.today || (output.today = [...state.today]);
+	skippable.bills || (output.bills = state.bills.map(b => reduceBill(b)));
+	skippable.paydays || (output.paydays = state.paydays.map(st => reducePayday(st)));
+	skippable.timeline || (output.timeline = state.timeline.map(t => checkIfPayday(t) ? reducePayday(t) : reduceBill(t)));
+	if(output.calc) {
+		// No need to check skippable because if it's there, it will delete calc and this will not run
+		output.calc = state.calc.map(cv => checkIfPayday(cv) ? reducePayday(cv) : reduceBill(cv));
+	//} else if (skippable.calc) {
+	//	output.calc = null;
 	}
 	return output;
 }
@@ -331,9 +358,9 @@ export const reduceBill = (bill) => {
 	output.recurs = reduceRecur(bill.recurs);
 	return output;
 };
-export const reduceSubtotal = (subtotal) => {
-	let output = {...subtotal};
-	output.recurs = reduceRecur(subtotal.recurs);
+export const reducePayday = (payday) => {
+	let output = {...payday};
+	output.recurs = reduceRecur(payday.recurs);
 	return output;
 };
 export const reduceRecur = (recur) => {
@@ -365,6 +392,16 @@ export function reducer(state, action = {}) {
 			final = reduceAll(state);
 			final.page = payload;
 			break;
+		case ADD_BILL:
+		case ADD_PAYDAY:
+		case REMOVE_BILL:
+		case REMOVE_PAYDAY:
+		case UPDATE_TIMELINE:
+		case UPDATE_CALC:
+		case SET_TODAY:
+		case SET_PREVIOUS:
+		case SET_NEXT:
+		case SET_TEXT_PROP:
 		default:
 			return state;
 			// NOTE: This will not log anything

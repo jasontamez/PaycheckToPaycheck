@@ -1,57 +1,74 @@
-import React, { useState } from 'react';
+//import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { NativeBaseProvider, Box, Switch, VStack } from "native-base";
-import { StyleSheet, Text, View } from 'react-native';
+import { NativeBaseProvider, VStack, HStack, Spinner, Heading, Container, Text } from "native-base";
 import { Provider, useSelector } from 'react-redux';
 import configureStore from './store/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import getTheme from './components/theme';
+//import Timeline from './components/timeline';
+//import Calc from './components/calc';
+import Menu from './components/menu';
 
 const App = () => {
-	const [isEnabled, setIsEnabled] = useState(false);
-	const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 	const {store, persistor} = configureStore();
-	const themeName = ((state) => state.theme);
+	const themeName = useSelector(state => state.theme);
 	const theme = getTheme(themeName);
 
-	const loading = null;
+	const loading = (
+		<VStack justifyContent={"center"}>
+			<HStack space="md" justifyContent={"center"}>
+				<Spinner accessibilityLabel="Loading info" color="secondary.500" />
+				<Heading color="primary.500" fontSize="md">Loading...</Heading>
+			</HStack>
+		</VStack>
+	);
+
+	const DisplayTimeline = () => {
+		const timeline = useSelector(state => state.timeline);
+		if(timeline.length === 0) {
+			return <Empty />;
+		}
+		// return <Timeline content={timeline} />;
+		return <Text>Null Timeline</Text>;
+	};
+
+	const Empty = () => {
+		const [bill, payday] = useSelector((state) => [state.aBill, state.aPaycheck]);
+		return (
+			<VStack bg="primary.500" alignContent={"center"}>
+				<Center>
+					<Text bold fontSize="lg">Add {bill} and/or {payday} to continue.</Text>
+				</Center>
+			</VStack>
+		);
+	};
+
+	const Content = () => {
+		const page = useSelector(state => state.page);
+		switch (page) {
+			case "timeline":
+				return <DisplayTimeline />;
+			//case "calc":
+			//	return <Calc />;
+		}
+		return <Text>Null Content</Text>;
+	};
 
 	return (
 		<Provider store={store}>
 			<NativeBaseProvider theme={theme}>
 				<PersistGate loading={loading} persistor={persistor}>
-					<VStack space="sm">
-						<Box></Box>
-					</VStack>
-					<View style={styles.main}>
-						<Box alignSelf="center" _text={{color: "#0ff"}}>Hellooooo world.</Box>
-						<Switch
-							onToggle={toggleSwitch}
-							isChecked={isEnabled}
-							offTrackColor="#900"
-							onTrackColor="#090"
-							onThumbColor="#0f0"
-							offThumbColor="#f00"
-						/>
-						<StatusBar style="default" backgroundColor="#69f" />
-						<Text style={styles.text}>{isEnabled ? "Enabled" : "Disabled"}</Text>
-					</View>
+					<Container bg="bg">
+						<VStack space="sm" justifyContent={"start"}>
+							<Menu />
+							<Content />
+						</VStack>
+					</Container>
 				</PersistGate>
+				<StatusBar style="default" backgroundColor="#69f" />
 			</NativeBaseProvider>
 		</Provider>
 	);
 };
-
-const styles = StyleSheet.create({
-	main: {
-		flex: 1,
-		backgroundColor: '#000',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	text: {
-		color: '#0ff'
-	}
-});
 
 export default App;
