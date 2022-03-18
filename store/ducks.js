@@ -95,7 +95,7 @@ export const blankAppState = {
 };
 const blankBill = {
 	// id: "",
-	// rootId: "",
+	subId: null,
 	startDate: 0,
 	amount: 0.0,
 	name: ""
@@ -108,7 +108,7 @@ export const makeBlankBill = () => {
 };
 const blankPayday = {
 	// id: "",
-	// rootId: "",
+	subId: null,
 	startDate: 0,
 	workingTotal: 0,
 	name: ""
@@ -131,31 +131,33 @@ export const recurrance = {
 };
 export const billValidator = (bill) => {
 	let	id = bill.id,
-		rootId = bill.rootId,
+		subId = bill.subId,
 		startDate = bill.startDate,
 		amount = bill.amount,
 		name = bill.name,
 		description = bill.description,
 		recurs = bill.recurs;
 	if(typeof id !== "string" || !id) {
-		maybeLog("bad id");
+		maybeLog("bad bill id");
 		return false;
-	} else if(typeof rootId !== "string" || !rootId) {
-		maybeLog("bad id");
+	} else if(subId !== null && (typeof subId !== "string" || !subId)) {
+		maybeLog("bad bill sub-id");
 		return false;
 	} else if(parseInt(startDate) !== startDate) {
-		maybeLog("bad startDate");
+		maybeLog("bad bill startDate");
 		return false;
 	} else if(typeof amount !== "number" || isNaN(amount) || amount < 0) {
-		maybeLog("bad amount");
+		maybeLog("bad bill amount");
 		return false;
 	} else if(typeof name !== "string" || !name) {
-		maybeLog("bad name");
+		maybeLog("bad bill name");
 		return false;
 	}
 	// Round amount to two decimal places
 	amount = Math.floor((amount + 0.005) * 100) / 100;
 	let output = {
+		id,
+		subId,
 		startDate,
 		amount,
 		name
@@ -178,36 +180,38 @@ export const billValidator = (bill) => {
 };
 export const paydayValidator = (payday) => {
 	let	id = payday.id,
-		rootId = bill.rootId,
+		subId = bill.subId,
 		startDate = payday.startDate,
 		workingTotal = payday.workingTotal,
 		name = payday.name,
 		description = payday.description,
 		recurs = payday.recurs;
 	if(typeof id !== "string" || !id) {
-		maybeLog("bad sub id");
+		maybeLog("bad payday id");
 		return false;
-	} else if(typeof rootId !== "string" || !rootId) {
-		maybeLog("bad id");
+	} else if(subId !== null && (typeof subId !== "string" || !subId)) {
+		maybeLog("bad payday sub-id");
 		return false;
 	} else if(parseInt(startDate) !== startDate) {
-		maybeLog("bad sub startDate");
+		maybeLog("bad payday startDate");
 		return false;
 	} else if(parseInt(workingTotal) !== workingTotal || workingTotal < 0) {
-		maybeLog("bad sub workingTotal");
+		maybeLog("bad payday workingTotal");
 		return false;
 	} else if(typeof name !== "string" || !name) {
-		maybeLog("bad sub name");
+		maybeLog("bad payday name");
 		return false;
 	}
 	let output = {
+		id,
+		subId,
 		startDate,
 		workingTotal,
 		name
 	};
 	if(description) {
 		if (typeof description !== "string" || !description) {
-			maybeLog("bad sub description");
+			maybeLog("bad payday description");
 			return false;
 		}
 		output.description = description;
