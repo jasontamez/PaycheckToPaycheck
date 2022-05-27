@@ -139,11 +139,11 @@ export const recurrance = {
 	period: "w",
 	amount: 1,
 	last: false
-	// repeatOnDay: undefined,
-	// repeatOnDate: undefined,
-	// repeatOnWeek: undefined,
-	// shortMonth: undefined,
-	// repeatOnMonth: undefined
+	// repeatOnDay: undefined,	// 0-based, day of week
+	// repeatOnDate: undefined,	// 1-based, day of month
+	// repeatOnWeek: undefined, // 1-based, max 4
+	// shortMonth: undefined,	// "this" or "next"
+	// repeatOnMonth: undefined	// 0-based
 };
 export const billValidator = (bill) => {
 	let	id = bill.id,
@@ -322,13 +322,13 @@ const recurranceValidator = (recur) => {
 			return false;
 		}
 		switch(repeatOnMonth) {
-			case 2:
+			case 1:	// Feb
 				max = 29;
 				break;
-			case 4:
-			case 6:
-			case 7:
-			case 11:
+			case 3:	// Apr
+			case 5:	// Jun
+			case 8:	// Sep
+			case 10:	// Nov
 				max = 30;
 		}
 		if(typeof repeatOnDate !== "number" || parseInt(repeatOnDate) !== repeatOnDate || repeatOnDate > max || repeatOnDate < 1) {
@@ -412,6 +412,18 @@ export function reducer(state, action = {}) {
 			final = reduceAll(state);
 			final.page = payload;
 			break;
+		case SET_TEXT_PROP:
+			final = reduceAll(state);
+			final[payload[0]] = payload[1];
+			break;
+		case SET_PREVIOUS:
+			final = reduceAll(state);
+			final.previous = payload;
+			break;
+		case SET_NEXT:
+			final = reduceAll(state);
+			final.next = payload;
+			break;
 		case ADD_BILL:
 		case ADD_PAYDAY:
 		case REMOVE_BILL:
@@ -419,9 +431,6 @@ export function reducer(state, action = {}) {
 		case UPDATE_TIMELINE:
 		case UPDATE_CALC:
 		case SET_TODAY:
-		case SET_PREVIOUS:
-		case SET_NEXT:
-		case SET_TEXT_PROP:
 		default:
 			return state;
 			// NOTE: This will not log anything
