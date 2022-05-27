@@ -1,5 +1,6 @@
 import { HStack, Menu, HamburgerIcon, Button, Divider } from "native-base";
 import { useSelector } from 'react-redux';
+import { maybeLog } from '../store/ducks';
 
 const MyMenu = () => {
 	const [bill, payday] = useSelector((state) => [state.bill, state.paycheck]);
@@ -14,7 +15,7 @@ const MyMenu = () => {
 	const close = () => {};
 
 	const pressed = (which) => {
-		console.log("Pressed: " + which);
+		maybeLog("Pressed: " + which);
 	};
 
 	return (

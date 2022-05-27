@@ -81,11 +81,11 @@ export const blankAppState = {
 	currentVersion: VERSION.current,
 	bills: [],		// all bills
 	paydays: [],	// all paydays
-	timeline: [],	// all bills and paydays, repeated and arranged in the given timeframe
-	calc: null,	// if null, not in use. otherwise, this is a user-made arrangement of bills and paydays
+	timeline: [],	// all bills and paydays, made into sub-bills and sub-paydays and arranged in the given timeframe
+	calc: null,	// if null, not in use. otherwise, this is a user-made arrangement of sub-bills and sub-paydays
 	today: getTodayArray(),	// [4, 17, 1, 2022] would be Thursday, February 17th, 2022
-	previous: 0,	// how far back do the bills go? is this a set number of days, or a set number of paydays?
-	next: 0,		// as above, but for how far ahead
+	previous: 0,	// how far back does the timeline go? is this a set number of days, or a set number of paydays?
+	next: 0,		// as above, but for how far into the future
 	bill: "bill",
 	paycheck: "paycheck",
 	aBill: "a bill",
@@ -106,6 +106,14 @@ export const makeBlankBill = () => {
 	const id = uuidv4();
 	return {id, ...blankBill};
 };
+export const makeSubBill = (bill) => {
+	const subId = uuidv4();
+	if(bill.subId) {
+		maybeLog("sub-bill passed to makeSubBill; " + bill.id + ", " + bill.subId);
+		return false;
+	}
+	return {...bill, subId};
+};
 const blankPayday = {
 	// id: "",
 	subId: null,
@@ -118,6 +126,14 @@ const blankPayday = {
 export const makeBlankPayday = () => {
 	const id = uuidv4();
 	return {id, ...blankPayday};
+};
+export const makeSubPayday = (payday) => {
+	const subId = uuidv4();
+	if(payday.subId) {
+		maybeLog("sub-payday passed to makeSubPayday; " + payday.id + ", " + payday.subId);
+		return false;
+	}
+	return {...payday, subId};
 };
 export const recurrance = {
 	period: "w",
@@ -423,7 +439,7 @@ export function reducer(state, action = {}) {
 //	maybeLog("Save", newState);
 //};
 
-const maybeLog = (...args) => {
+export const maybeLog = (...args) => {
 	if(appJson.logging) {
 		args.forEach((x) => console.log(x));
 	}
